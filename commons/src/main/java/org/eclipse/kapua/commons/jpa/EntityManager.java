@@ -17,6 +17,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 
 import org.eclipse.kapua.KapuaException;
+import org.eclipse.kapua.commons.model.id.KapuaEid;
 import org.eclipse.kapua.model.KapuaEntity;
 import org.eclipse.kapua.model.id.KapuaId;
 import org.slf4j.Logger;
@@ -149,7 +150,8 @@ public class EntityManager
      */
     public <E extends KapuaEntity> E find(Class<E> clazz, KapuaId id)
     {
-        return javaxPersitenceEntityManager.find(clazz, id);
+        KapuaEid eid = id instanceof KapuaEid ? (KapuaEid) id : new KapuaEid(id); 
+        return javaxPersitenceEntityManager.find(clazz, eid);
     }
 
     /**

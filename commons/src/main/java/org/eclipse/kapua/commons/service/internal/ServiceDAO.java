@@ -537,8 +537,14 @@ public class ServiceDAO {
             throws KapuaException {
         Expression<Boolean> expr;
         String attrName = attrPred.getAttributeName();
-        Object attrValue = attrPred.getAttributeValue();
         SingularAttribute attribute = entityType.getSingularAttribute(attrName);
+
+        // Parse attributes
+        Object attrValue = attrPred.getAttributeValue();
+        if (attrValue instanceof KapuaId && !(attrValue instanceof KapuaEid)) {
+            attrValue = new KapuaEid((KapuaId) attrValue);
+        }
+        
         if (attrValue instanceof Object[] && ((Object[]) attrValue).length == 1) {
             Object[] attrValues = (Object[]) attrValue;
             attrValue = attrValues[0];

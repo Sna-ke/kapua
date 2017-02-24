@@ -13,5 +13,5 @@ after_success:
     pwd;
     mvn -Pdocker;
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
-    docker push bcgovbrian/kapua-broker;
+    docker push docker.io/bcgovbrian/kapua-broker;
     fi

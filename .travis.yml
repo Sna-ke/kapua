@@ -8,10 +8,8 @@ services:
   - docker
 
 after_success:
-  - if [ "$TRAVIS_BRANCH" == "develop" ]; then
-    cd $TRAVIS_BUILD_DIR/assembly;
-    pwd;
-    mvn -Pdocker;
-    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
-    docker push docker.io/bcgovbrian/kapua-broker:latest;
-    fi
+  - cd $TRAVIS_BUILD_DIR/assembly;
+  - pwd;
+  - mvn -Pdocker;
+  - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
+  - docker push docker.io/bcgovbrian/kapua-broker:latest;

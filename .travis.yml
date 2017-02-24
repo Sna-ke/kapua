@@ -15,6 +15,11 @@ after_success:
 
 after_script:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
+  - docker tag bcgovbrian/kapua-sql docker.io/bcgovbrian/kapua-sql:latest;
+  - docker tag bcgovbrian/kapua-liquibase docker.io/bcgovbrian/kapua-liquibase:latest;
+  - docker tag bcgovbrian/kapua-broker docker.io/bcgovbrian/kapua-broker:latest;
+  - docker tag bcgovbrian/kapua-console docker.io/bcgovbrian/kapua-console:latest;
+  - docker tag bcgovbrian/kapua-api docker.io/bcgovbrian/kapua-api:latest;
   - docker push docker.io/bcgovbrian/kapua-sql:latest;
   - docker push docker.io/bcgovbrian/kapua-liquibase:latest;
   - docker push docker.io/bcgovbrian/kapua-broker:latest;

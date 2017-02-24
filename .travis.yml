@@ -12,7 +12,6 @@ after_success:
     cd $TRAVIS_BUILD_DIR/assembly;
     pwd;
     mvn -Pdocker;
-    docker build -t bcgovbrian/kapua-broker:latest;
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
     docker push docker.io/bcgovbrian/kapua-broker:latest;
     fi

@@ -12,5 +12,11 @@ after_success:
   - pwd;
   - mvn -Pdocker;
   - docker images
+
+after_script:
   - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
+  - docker push docker.io/bcgovbrian/kapua-sql:latest;
+  - docker push docker.io/bcgovbrian/kapua-liquibase:latest;
   - docker push docker.io/bcgovbrian/kapua-broker:latest;
+  - docker push docker.io/bcgovbrian/kapua-console:latest;
+  - docker push docker.io/bcgovbrian/kapua-api:latest;

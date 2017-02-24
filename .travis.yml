@@ -12,5 +12,5 @@ after_success:
     cd $TRAVIS_BUILD_DIR
     mvn -Pdocker
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
-    docker push kapua-broker;
+    docker push kapua/kapua-broker;
     fi

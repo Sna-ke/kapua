@@ -3,5 +3,14 @@ jdk:
   - oraclejdk8
 
 sudo: required
+
 services:
   - docker
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "develop" ]; then
+    cd $TRAVIS_BUILD_DIR
+    mvn -Pdocker
+    docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
+    docker push kapua-broker;
+    fi

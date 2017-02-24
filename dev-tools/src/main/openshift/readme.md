@@ -68,7 +68,7 @@ For more information about the "EPEL repositories" see https://fedoraproject.org
 
 Execute the following command:
 
-    DOCKER_ACCOUNT=hekonsek bash <(curl -sL https://raw.githubusercontent.com/eclipse/kapua/develop/dev-tools/src/main/openshift/openshift-deploy.sh)
+    bash <(curl -sL https://raw.githubusercontent.com/Sna-ke/kapua/develop/dev-tools/src/main/openshift/openshift-deploy.sh)
 
 Now open the following URL in your web browser - `http://localhost:8080/console`. And log-in into Kapua UI using default
 credentials:

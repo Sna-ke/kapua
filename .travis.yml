@@ -12,15 +12,9 @@ after_success:
     cd $TRAVIS_BUILD_DIR/assembly;
     pwd;
     mvn -Pdocker;
-    fi
-
-before_deploy:
-  - if [ "$TRAVIS_BRANCH" == "develop" ]; then
-    docker build -t bcgovbrian/kapua-broker:latest -t bcgovbrian/kapua-broker:$TRAVIS_BRANCH_$TRAVIS_BUILD_NUMBER;
-    fi
     
-deploy:
-  - if [ "$TRAVIS_BRANCH" == "develop" ]; then
+    docker build -t bcgovbrian/kapua-broker:latest -t bcgovbrian/kapua-broker:$TRAVIS_BRANCH_$TRAVIS_BUILD_NUMBER;
+    
     docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" $DOCKER_REGISTRY;
     docker push docker.io/bcgovbrian/kapua-broker:latest;
     fi

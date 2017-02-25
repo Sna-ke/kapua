@@ -23,7 +23,7 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <docker.account>kapua</docker.account>
+        <docker.account>bcgovbrian</docker.account>
     </properties>
 
     <profiles>

@@ -12,24 +12,33 @@
 
 set -e
 
-OPENSHIFT_PROJECT_NAME="eclipse-kapua"
-
 # print error and exit when necessary
 die() { printf "$@" "\n" 1>&2 ; exit 1; }
 
 #minishift start
 #eval $(minishift docker-env)
 
+# Setup Parameters
+OPENSHIFT_PROJECT_NAME="eclipse-ws-kapua"
+DOCKER_ACCOUNT=hekonsek
+DOCKER_IMAGE_KAPUA_API=${DOCKER_ACCOUNT}/kapua-ws-api:latest
+DOCKER_IMAGE_KAPUA_SQL=${DOCKER_ACCOUNT}/kapua-ws-sql
+DOCKER_IMAGE_KAPUA_BROKER=${DOCKER_ACCOUNT}/kapua-ws-broker:latest
+#DOCKER_IMAGE_KAPUA_BROKER=redhatiot/kapua-ws-broker:latest
+#DOCKER_IMAGE_KAPUA_BROKER=bcgovbrian/kapua-ws-broker
+DOCKER_IMAGE_KAPUA_CONSOLE=${DOCKER_ACCOUNT}/kapua-ws-console:latest
+DOCKER_IMAGE_KAPUA_LIQUBASE=${DOCKER_ACCOUNT}/kapua-ws-liquibase:latest
+
 # test if the project is already created ... fail otherwise 
 
-oc describe "project/$OPENSHIFT_PROJECT_NAME" &>/dev/null || die "Project '$OPENSHIFT_PROJECT_NAME' not created or OpenShift is unreachable. Try with:\n\n\toc new-project eclipse-kapua\n\n"
+oc describe "project/$OPENSHIFT_PROJECT_NAME" &>/dev/null || oc new-project "$OPENSHIFT_PROJECT_NAME" --description="Open source IoT Platform" --display-name="Eclipse Kapua (Dev)"
 
 #oc login
 #oc new-project "$OPENSHIFT_PROJECT_NAME" --description="Open source IoT Platform" --display-name="Eclipse Kapua"
 
-if [ -z "${DOCKER_ACCOUNT}" ]; then
-  DOCKER_ACCOUNT=kapua
-fi
+#if [ -z "${DOCKER_ACCOUNT}" ]; then
+#  DOCKER_ACCOUNT=kapua
+#fi
 
 echo Creating ElasticSearch server...
 
@@ -45,7 +54,7 @@ echo ElasticSearch server created
 
 echo Creating SQL database
 
-oc new-app ${DOCKER_ACCOUNT}/kapua-sql --name=sql -n "$OPENSHIFT_PROJECT_NAME"
+oc new-app ${DOCKER_IMAGE_KAPUA_SQL} --name=sql -n "$OPENSHIFT_PROJECT_NAME"
 oc set probe dc/sql --readiness --open-tcp=3306
 
 echo SQL database created
@@ -54,8 +63,9 @@ echo SQL database created
 
 echo Creating broker
 
-oc new-app ${DOCKER_ACCOUNT}/kapua-broker:latest -name=kapua-broker -n "$OPENSHIFT_PROJECT_NAME" '-eACTIVEMQ_OPTS=-Dcommons.db.connection.host=localhost -Dcommons.db.connection.port=3306 -Dcommons.db.schema='
-oc set probe dc/kapua-broker --readiness --open-tcp=1883
+oc new-app ${DOCKER_IMAGE_KAPUA_BROKER} -name=kapua-broker -n "$OPENSHIFT_PROJECT_NAME" \
+   '-eACTIVEMQ_OPTS=-Dcommons.db.connection.host=$SQL_SERVICE_HOST -Dcommons.db.connection.port=$SQL_SERVICE_PORT_3306_TCP -Dcommons.db.schema='
+oc set probe dc/kapua-broker --readiness --initial-delay-seconds=15 --open-tcp=1883
 
 echo Broker created
 
@@ -64,8 +74,9 @@ echo Broker created
 
 echo Creating web console
 
-oc new-app ${DOCKER_ACCOUNT}/kapua-console:latest -n "$OPENSHIFT_PROJECT_NAME" '-eCATALINA_OPTS=-Dcommons.db.connection.host=localhost -Dcommons.db.connection.port=3306 -Dcommons.db.schema='
-oc set probe dc/kapua-console --readiness --liveness --initial-delay-seconds=30 --get-url=http://:8080/console
+oc new-app ${DOCKER_IMAGE_KAPUA_CONSOLE} -n "$OPENSHIFT_PROJECT_NAME" \
+   '-eCATALINA_OPTS=-Dcommons.db.connection.host=$SQL_SERVICE_HOST -Dcommons.db.connection.port=$SQL_SERVICE_PORT_3306_TCP -Dcommons.db.schema= -Dbroker.host=$KAPUA_BROKER_SERVICE_HOST'
+oc set probe dc/kapua-console --readiness --liveness --initial-delay-seconds=30 --timeout-seconds=10 --get-url=http://:8080/console
 
 echo Web console created
 
@@ -73,15 +84,16 @@ echo Web console created
 
 echo 'Creating Rest API'
 
-oc new-app ${DOCKER_ACCOUNT}/kapua-api:latest -n "$OPENSHIFT_PROJECT_NAME" '-eCATALINA_OPTS=-Dcommons.db.connection.host=localhost -Dcommons.db.connection.port=3306 -Dcommons.db.schema='
-oc set probe dc/kapua-api --readiness --liveness --initial-delay-seconds=30 --get-url=http://:8080/api
+oc new-app ${DOCKER_IMAGE_KAPUA_API} -n "$OPENSHIFT_PROJECT_NAME" \
+   '-eCATALINA_OPTS=-Dcommons.db.connection.host=$SQL_SERVICE_HOST -Dcommons.db.connection.port=$SQL_SERVICE_PORT_3306_TCP -Dcommons.db.schema= -Dbroker.host=$KAPUA_BROKER_SERVICE_HOST'
+oc set probe dc/kapua-api --readiness --liveness --initial-delay-seconds=30 --timeout-seconds=10 --get-url=http://:8080/api
 
 echo 'Rest API created'
 
 ## Applying DB schema
 
 # Create batch job for liquibase
-oc set image -f liquibase_job.yml "liquibase=$DOCKER_ACCOUNT/kapua-liquibase:latest" --local --source=docker -o yaml | oc create -f -
+oc set image -f liquibase_job.yml "liquibase=$DOCKER_IMAGE_KAPUA_LIQUBASE" --local --source=docker -o yaml | oc create -f -
 
 ## Start router
 

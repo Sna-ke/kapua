@@ -27,7 +27,7 @@
 		<tomcat.version>8.0.38</tomcat.version>
         <commons.pool.version>2.3</commons.pool.version>
 
-		<docker.account>kapua</docker.account>
+		<docker.account>bcgovbrian</docker.account>
 		<java.base.image>java:8u111</java.base.image>
     </properties>
 

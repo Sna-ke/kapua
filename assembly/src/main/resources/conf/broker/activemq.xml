@@ -434,7 +434,7 @@
 
         
         <sslContext>
-            <sslContext keyStore="conf/kapua.ks" keyStorePassword="kapua-password"/>
+            <sslContext keyStore="${activemq.conf}/kapua.ks" keyStorePassword="kapua-password"/>
         </sslContext>
         
 

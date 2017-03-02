@@ -27,8 +27,6 @@ DOCKER_IMAGE_KAPUA_BROKER=${DOCKER_ACCOUNT}/kapua-broker:latest
 #DOCKER_IMAGE_KAPUA_BROKER=redhatiot/kapua-broker:latest
 #DOCKER_IMAGE_KAPUA_BROKER=bcgovbrian/kapua-broker
 DOCKER_IMAGE_KAPUA_CONSOLE=${DOCKER_ACCOUNT}/kapua-console:latest
-DOCKER_IMAGE_KAPUA_LIQUBASE=${DOCKER_ACCOUNT}/kapua-liquibase:latest
-
 # test if the project is already created ... fail otherwise 
 
 oc describe "project/$OPENSHIFT_PROJECT_NAME" &>/dev/null || oc new-project "$OPENSHIFT_PROJECT_NAME" --description="Open source IoT Platform" --display-name="Eclipse Kapua (Dev)"
@@ -89,11 +87,6 @@ oc new-app ${DOCKER_IMAGE_KAPUA_API} -n "$OPENSHIFT_PROJECT_NAME" \
 oc set probe dc/kapua-api --readiness --liveness --initial-delay-seconds=30 --timeout-seconds=10 --get-url=http://:8080/api
 
 echo 'Rest API created'
-
-## Applying DB schema
-
-# Create batch job for liquibase
-oc set image -f liquibase_job.yml "liquibase=$DOCKER_IMAGE_KAPUA_LIQUBASE" --local --source=docker -o yaml | oc create -f -
 
 ## Start router
 

@@ -31,29 +31,35 @@
         <assertj.version>3.2.0</assertj.version>
         <camel.version>2.16.3</camel.version>
         <commons-configuration.version>1.9</commons-configuration.version>
+        <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>3.3.2</commons-lang.version>
         <commons-pool.version>2.3</commons-pool.version>
+        <dropwizard.version>3.1.2</dropwizard.version>
         <eclipselink.version>2.6.3</eclipselink.version>
+        <findbugs.version>2.0.1</findbugs.version>
         <guava.version>19.0</guava.version>
         <guice.version>4.1.0</guice.version>
         <h2.version>1.4.192</h2.version>
+        <javassist.version>3.19.0-GA</javassist.version>
         <joda.version>2.9.4</joda.version>
         <junit.version>4.11</junit.version>
+        <liquibase.version>3.0.5</liquibase.version>
         <mariadb.version>1.4.6</mariadb.version>
         <mockito.version>1.10.19</mockito.version>
         <paho.version>1.1.0</paho.version>
         <protobuf.version>2.6.1</protobuf.version>
-        <slf4j.version>1.7.2</slf4j.version>
+        <reflections.version>0.9.10</reflections.version>
         <shiro.version>1.2.3</shiro.version>
+        <slf4j.version>1.7.2</slf4j.version>
+        <snakeyaml.version>1.15</snakeyaml.version>
         <validation-api.version>1.1.0.Final</validation-api.version>
         <cucumber.version>1.2.4</cucumber.version>
-		<elasticsearch.version>2.3.4</elasticsearch.version>
-        
+        <elasticsearch.version>2.3.4</elasticsearch.version>
+
         <!-- Plugins versions -->
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
         <docker-maven-plugin.version>0.17.2</docker-maven-plugin.version>
-        <liquibase-plugin.version>3.0.5</liquibase-plugin.version>
 
         <jacoco.version>0.7.4.201502262128</jacoco.version>
         <surefire.version>2.12.4</surefire.version>
@@ -61,14 +67,14 @@
         <!-- -->
         <!-- Database configuration for local installs and tests -->
         <!-- Database host address is the one exported by the dev-tools/src/vagrant/Vagrantfile  -->        
-		<db.host>192.168.33.10</db.host>
-		<db.name>kapuadb</db.name>        
-		<db.schema>kapuadb</db.schema>        
-		<db.conn.properties>schema=${db.schema}</db.conn.properties>
-		<db.conn.url>jdbc:h2:tcp://${db.host}:3306/${db.name};${db.conn.properties}</db.conn.url>
+        <db.host>192.168.33.10</db.host>
+        <db.name>kapuadb</db.name>
+        <db.schema>kapuadb</db.schema>
+        <db.conn.properties>schema=${db.schema}</db.conn.properties>
+        <db.conn.url>jdbc:h2:tcp://${db.host}:3306/${db.name};${db.conn.properties}</db.conn.url>
         <db.username>kapua</db.username>
         <db.password>kapua</db.password>
-        
+
     </properties>
 
     <build>
@@ -90,24 +96,24 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>${maven-dependency-plugin.version}</version>
                 </plugin>
-			    <plugin>
-        			<groupId>org.codehaus.mojo</groupId>
-        			<artifactId>sql-maven-plugin</artifactId>
-        			<version>1.5</version>
-        			<dependencies>
-				        <dependency>
-						    <groupId>com.h2database</groupId>
-						    <artifactId>h2</artifactId>
-						    <version>${h2.version}</version>
-						</dependency>
-				    </dependencies>
-				    <configuration>
-                    	<driver>org.h2.Driver</driver>
-						<url>${db.conn.url}</url>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>
+                    <version>1.5</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.h2database</groupId>
+                            <artifactId>h2</artifactId>
+                            <version>${h2.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <driver>org.h2.Driver</driver>
+                        <url>${db.conn.url}</url>
                         <username>${db.username}</username>
                         <password>${db.password}</password>
-                    </configuration>                    
-				</plugin>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
@@ -182,39 +188,21 @@
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
-                                	<pluginExecutionFilter>
-                                		<groupId>
-                                			org.codehaus.mojo
-                                		</groupId>
-                                		<artifactId>
-                                			sql-maven-plugin
-                                		</artifactId>
-                                		<versionRange>
-                                			[1.5,)
-                                		</versionRange>
-                                		<goals>
-                                			<goal>execute</goal>
-                                		</goals>
-                                	</pluginExecutionFilter>
-                                	<action>
-                                		<ignore />
-                                	</action>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.codehaus.mojo</groupId>
+                                        <artifactId>sql-maven-plugin</artifactId>
+                                        <versionRange>[1.5,)</versionRange>
+                                        <goals>
+                                                <goal>execute</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
                                 </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.liquibase</groupId>
-                    <artifactId>liquibase-maven-plugin</artifactId>
-                    <version>${liquibase-plugin.version}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.h2database</groupId>
-                            <artifactId>h2</artifactId>
-                            <version>${h2.version}</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -461,6 +449,36 @@
 
             <!-- External dependencies -->
             <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-configuration</groupId>
+                <artifactId>commons-configuration</artifactId>
+                <version>${commons-configuration.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-core</artifactId>
                 <version>${camel.version}</version>
@@ -486,29 +504,14 @@
                 <version>${eclipselink.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibase.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.inject</groupId>
-                <artifactId>guice</artifactId>
-                <version>${guice.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${protobuf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${h2.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-configuration</groupId>
-                <artifactId>commons-configuration</artifactId>
-                <version>${commons-configuration.version}</version>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.validation</groupId>
@@ -555,11 +558,31 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.elasticsearch</groupId>
 				<artifactId>elasticsearch</artifactId>
 				<version>${elasticsearch.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>annotations</artifactId>
+                <version>${findbugs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>${dropwizard.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -577,24 +600,24 @@
         <!-- Applications -->
         <module>console</module>
         <module>rest-api</module>
-        
+
         <!-- Assembly -->
         <module>assembly</module>
 
         <module>dev-tools</module>
     </modules>
 
-	<profiles>
-		<profile>
-			<id>dev-tools</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<modules>
-				<module>dev-tools</module>
-			</modules>
-		</profile>
-	</profiles>
+    <profiles>
+        <profile>
+            <id>dev-tools</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <modules>
+                <module>dev-tools</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <licenses>
         <license>

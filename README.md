@@ -9,7 +9,7 @@
 To install Kapua&trade; on your local machine please refer to:
 [quick start guide](dev-tools/src/main/vagrant/README.MD#demo-machine-quick-start)
 
-For more information, refer to:
+For more information, refer to: 
 
 * [User Manual](docs/user-manual/en)
 * [Developer Guide](docs/developer-guide/en)
